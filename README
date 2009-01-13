@@ -1,7 +1,24 @@
-I'm a PR bot. I have the following commands available:
+Project Reality Mod IRC bot
+
+irc.quakenet.org
+#projectreality
+
+Commands available:
+
 - !latest returns the latest posts in the forums.
+
 - !server <shortname> gets the current server status.
 - !server <shortname> <ip>:<port> registers the server with that shortname.
+
 - !released <version_number> checks if a version was released. 
+
+- !hardcoded tells you something that is or not hardcoded.
 - !hardcoded <something> [true|false] gets or sets if that thing is hardcoded.
+
 - !country <nick> [country] gets or sets the country of that person.
+
+- !leet <nick> tells you if somebody is leet.
+
+- !likesmen <nick> tells you if somebody likes men.
+
+- !nuke, !jdam, !arty, !mortars, !ied, !grenade, !rifle, !sniper gives you the sound.
