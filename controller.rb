@@ -1,10 +1,13 @@
 # Controller for the Pr leaf.
+
+require 'rubygems'
+require 'hpricot'
 require 'simple-rss'
 require 'open-uri'
 
 class Controller < Autumn::Leaf
   before_filter :check_message, :except => [ :about, :latest, :nuke ]
-  before_filter :downcase_message, :only => [ :leet, :hardcoded, :likesmen ]
+  before_filter :downcase_message, :only => [ :leet, :hardcoded, :likesmen, :server ]
   
   def about_command(stem, sender, reply_to, msg)
   end
@@ -68,7 +71,26 @@ class Controller < Autumn::Leaf
   end
   
   def nuke_command(stem, sender, reply_to, msg)
-    "boom"
+    "BOOOOOOOOOOOOOOMMMMMMMMMMMMM"
+  end
+  
+  def server_command(stem, sender, reply_to, msg)
+    if msg =~ /^(.*)\s+(([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)\:([0-9]+))$/i then
+      name = $1.downcase
+      ip = $2
+      # ip = "64.34.161.157:16567"
+    else
+      name = msg
+      ip = nil
+    end
+    
+    database(:local) do
+      if ! ip.nil? then
+        set_server( name, ip, sender ) ? "updated" : "error"
+      else
+        get_server( name )
+      end
+    end
   end
   
   private
@@ -79,6 +101,50 @@ class Controller < Autumn::Leaf
   
   LIKESMEN = [ 'rhino', 'katarn' ]
   LIKESMEN_NOWAY = [ 'dbzao' ]
+  
+  def set_server( name, ip, sender )
+    s = Server.get( name )
+    if s
+      s.update_attributes( :ip => ip, :added_by => sender[:nick] )
+    else
+      Server.create( :name => name, :ip => ip, :added_by => sender[:nick] )
+    end
+  end
+  
+  def get_server( name )
+    
+    s = Server.get( name )
+    return "sorry, I don't know that server, but you can add it using !server <name> <ip>:<port>" if s.nil?
+    
+    begin
+      f = open("http://www.gametracker.com/server_info/#{s.ip}/")
+      doc = Hpricot(f)
+    rescue
+      return '404 bad server address'
+    end
+    
+    error = doc.at("//title").inner_html
+    return 'bad server address' if error.include?( "No Statistics Available" )
+    
+    server = doc.at("//div[@class='server_header_title']").inner_html.strip
+    puts server.inspect
+    
+    players = doc.at("//span[@id='HTML_num_players']").inner_html.strip
+    puts players.inspect
+    
+    max = doc.at("//span[@id='HTML_max_players']").inner_html.strip
+    puts max.inspect
+    
+    country = doc.at("//img[@class='flag']")['src']
+    if country =~ /([a-z]{2})\.gif/i then
+      country = $1.uppercase
+    end
+    
+    map = doc.at("//div[@class='si_map_header']").inner_html.strip
+    
+    "%s | %d/%d %s | %s (by %s)" % [ server, players, max, map, country, s.added_by ]
+    
+  end
   
   def set_hardcoded( thing, hardcoded, sender )
     h = Hardcoded.get( thing )
@@ -125,7 +191,7 @@ class Controller < Autumn::Leaf
   end
   
   def downcase_message_filter(stem, channel, sender, command, msg, opts)
-    msg.downcase!
+    msg.downcase! if ! msg.nil?
     true
   end
   
