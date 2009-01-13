@@ -4,9 +4,10 @@ require 'rubygems'
 require 'hpricot'
 require 'simple-rss'
 require 'open-uri'
+require 'facets/random'
 
 class Controller < Autumn::Leaf
-  before_filter :check_message, :except => [ :about, :latest, :nuke ]
+  before_filter :check_message, :except => [ :about, :latest, :nuke, :hardcoded ]
   before_filter :downcase_message, :only => [ :leet, :hardcoded, :likesmen, :server ]
   
   def about_command(stem, sender, reply_to, msg)
@@ -44,7 +45,10 @@ class Controller < Autumn::Leaf
   end
   
   def hardcoded_command(stem, sender, reply_to, msg)
-    if msg =~ /^(.*)\s+(true|false)$/i then
+    if msg.nil? then
+      thing = 'random'
+      hardcoded = nil
+    elsif msg =~ /^(.*)\s+(true|false)$/i
       thing = $1.downcase
       hardcoded = ( $2 == 'true' ? true : false )
     else
@@ -53,6 +57,10 @@ class Controller < Autumn::Leaf
     end
     
     database(:local) do
+      if thing == 'random'
+        return get_random_hardcoded
+      end
+      
       if ! hardcoded.nil? then
         set_hardcoded( thing, hardcoded, sender ) ? ( hardcoded ? "hardcoded" : "not hardcoded" ) : "error"
       else
@@ -164,6 +172,11 @@ class Controller < Autumn::Leaf
     end
   end
   
+  def get_random_hardcoded
+    h = Hardcoded.all.at_rand
+    h.thing + ' = ' + ( h.hardcoded ? "hardcoded" : "not hardcoded" ) + " (by " + h.added_by + ")"
+  end
+  
   def set_country( nick, country, sender )
     c = Country.get( nick )
     if c
@@ -185,6 +198,7 @@ class Controller < Autumn::Leaf
   def check_message_filter(stem, channel, sender, command, msg, opts)
     if msg.nil? then 
       stem.message "Type !about to learn how to use this command", channel
+      false
     else
       true
     end
