@@ -73,7 +73,7 @@ class Controller < Autumn::Leaf
     'afterdune' => 'Netherlands, Holland, Dutch land, take your pick',
     'prbot' => 'If I tell you, I have to kill you',
     'q' => 'The interwebz',
-    'fuzzhead' => 'Canada, with all the koalas',
+    'fuzzhead' => 'Canada, with all the beavers',
     'katarn' => 'America, Fuck Yeah!'
   }
   
