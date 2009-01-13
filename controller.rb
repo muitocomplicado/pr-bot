@@ -14,7 +14,11 @@ class Controller < Autumn::Leaf
   end
   
   def leet_command(stem, sender, reply_to, msg)
-    LEET.include?(msg) ? "yes" : "no way"
+    if msg =~ /^(\S+)$/i then
+      LEET.include?(msg) ? "yes" : "no way"
+    else
+      "type only a nickname"
+    end
   end
   
   def country_command(stem, sender, reply_to, msg)
@@ -71,7 +75,7 @@ class Controller < Autumn::Leaf
   
   VERSIONS = [ 0.1, 0.2, 0.32, 0.4, 0.5, 0.6, 0.7, 0.75, 0.8 ]
   
-  LEET = [ 'db', 'dbzao', 'ancientman', 'e-gor', 'prbot' ]
+  LEET = [ 'db', 'dbzao', 'ancientman', 'e-gor', 'prbot', 'projectreality', 'realitymod', 'pr', 'prm' ]
   
   LIKESMEN = [ 'rhino', 'katarn' ]
   LIKESMEN_NOWAY = [ 'dbzao' ]
