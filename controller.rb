@@ -3,7 +3,7 @@ require 'simple-rss'
 require 'open-uri'
 
 class Controller < Autumn::Leaf
-  before_filter :check_message, :except => [ :about, :latest ]
+  before_filter :check_message, :except => [ :about, :latest, :nuke ]
   before_filter :downcase_message, :only => [ :leet, :hardcoded, :likesmen ]
   
   def about_command(stem, sender, reply_to, msg)
@@ -61,6 +61,10 @@ class Controller < Autumn::Leaf
   def latest_command(stem, sender, reply_to, msg)
     rss = SimpleRSS.parse(open('http://www.realitymod.com/forum/external.php?type=RSS2'))
     var :rss => rss.items[0..4]
+  end
+  
+  def nuke_command(stem, sender, reply_to, msg)
+    "boom"
   end
   
   private
