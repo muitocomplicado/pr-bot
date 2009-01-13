@@ -67,13 +67,13 @@ class Controller < Autumn::Leaf
   end
   
   COUNTRIES = {
-    'ancientman' => 'Australia',
-    'dbzao' => 'Brazil',
+    'ancientman' => 'Australia, with all the kangaroos',
+    'dbzao' => 'Brazil, with all the monkeys',
     'e-gor' => 'The Mighty British Empire',
     'afterdune' => 'Netherlands, Holland, Dutch land, take your pick',
     'prbot' => 'If I tell you, I have to kill you',
     'q' => 'The interwebz',
-    'fuzzhead' => 'Canada',
+    'fuzzhead' => 'Canada, with all the koalas',
     'katarn' => 'America, Fuck Yeah!'
   }
   
