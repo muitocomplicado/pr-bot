@@ -135,20 +135,10 @@ class Controller < Autumn::Leaf
     return 'bad server address' if error.include?( "No Statistics Available" )
     
     server = doc.at("//div[@class='server_header_title']").inner_html.strip
-    puts server.inspect
-    
     players = doc.at("//span[@id='HTML_num_players']").inner_html.strip
-    puts players.inspect
-    
     max = doc.at("//span[@id='HTML_max_players']").inner_html.strip
-    puts max.inspect
-    
-    country = doc.at("//img[@class='flag']")['src']
-    if country =~ /([a-z]{2})\.gif/i then
-      country = $1.uppercase
-    end
-    
     map = doc.at("//div[@class='si_map_header']").inner_html.strip
+    country = doc.at("//img[@class='flag']")['src'].match(/([a-z]{2})\.gif/i)[1].uppercase
     
     "%s | %d/%d %s | %s (by %s)" % [ server, players, max, map, country, s.added_by ]
     
