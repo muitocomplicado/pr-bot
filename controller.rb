@@ -7,7 +7,9 @@ require 'open-uri'
 require 'facets/random'
 
 class Controller < Autumn::Leaf
-  before_filter :check_message, :except => [ :about, :latest, :nuke, :hardcoded ]
+  before_filter :check_message, 
+                :except => [ :about, :latest, :hardcoded, :nuke, :jdam, :arty, 
+                             :mortars, :ied, :grenade, :rifle, :sniper ]
   before_filter :downcase_message, :only => [ :leet, :hardcoded, :likesmen, :server ]
   
   def about_command(stem, sender, reply_to, msg)
@@ -79,7 +81,35 @@ class Controller < Autumn::Leaf
   end
   
   def nuke_command(stem, sender, reply_to, msg)
-    "BOOOOOOOOOOOOOOMMMMMMMMMMMMM"
+    "KABOOOOOOOOOOOOOOMMMMMMMMMMMMM"
+  end
+  
+  def arty_command(stem, sender, reply_to, msg)
+    "BOOOOOOM    BOOOOOOM    BOOOOOOM    BOOOOOOM"
+  end
+  
+  def mortars_command(stem, sender, reply_to, msg)
+    "BOOOM  BOOOM  BOOOM  BOOOM  BOOOM  BOOOM"
+  end
+  
+  def jdam_command(stem, sender, reply_to, msg)
+    "BADABOOOOOOOOOOOM"
+  end
+  
+  def ied_command(stem, sender, reply_to, msg)
+    "BOOOOOOM ALLAAAAAH"
+  end
+  
+  def grenade_command(stem, sender, reply_to, msg)
+    "BOOM"
+  end
+  
+  def rifle_command(stem, sender, reply_to, msg)
+    "BANG"
+  end
+  
+  def sniper_command(stem, sender, reply_to, msg)
+    "BANG      CLACK-CLITCH"
   end
   
   def server_command(stem, sender, reply_to, msg)
