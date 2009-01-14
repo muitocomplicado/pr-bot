@@ -21,4 +21,6 @@ Commands available:
 
 - !likesmen <nick> tells you if somebody likes men.
 
+- !google <something> gives you a link using letmegooglethatforyou.com
+
 - !nuke, !jdam, !arty, !mortars, !ied, !grenade, !rifle, !sniper gives you the sound.

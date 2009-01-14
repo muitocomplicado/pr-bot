@@ -5,6 +5,7 @@ require 'hpricot'
 require 'simple-rss'
 require 'open-uri'
 require 'facets/random'
+require 'uri'
 
 class Controller < Autumn::Leaf
   before_filter :check_message, 
@@ -129,6 +130,10 @@ class Controller < Autumn::Leaf
         get_server( name )
       end
     end
+  end
+  
+  def google_command(stem, sender, reply_to, msg)
+    URI.escape("http://www.letmegooglethatforyou.com/?q=" + msg )
   end
   
   private
