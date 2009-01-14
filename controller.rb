@@ -1,11 +1,17 @@
 # Controller for the Pr leaf.
 
 require 'rubygems'
+
+gem 'hpricot', '~> 0.6.164'
+gem 'simple-rss', '~> 1.1'
+gem 'facets', '~> 2.5.0'
+
 require 'hpricot'
 require 'simple-rss'
 require 'open-uri'
 require 'facets/random'
 require 'uri'
+
 
 class Controller < Autumn::Leaf
   before_filter :check_message, 
