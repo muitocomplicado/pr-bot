@@ -23,4 +23,6 @@ Commands available:
 
 - !google <something> gives you a link using letmegooglethatforyou.com
 
+- !magic_eight_ball <question> gives you an answer to that question.
+
 - !nuke, !jdam, !arty, !mortars, !ied, !grenade, !rifle, !sniper gives you the sound.
