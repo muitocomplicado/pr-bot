@@ -237,7 +237,7 @@ class Controller < Autumn::Leaf
   
   def check_message_filter(stem, channel, sender, command, msg, opts)
     if msg.nil? then 
-      stem.message "Type !about to learn how to use this command", channel
+      stem.message "Type !help to learn how to use this command", channel
       false
     else
       true
