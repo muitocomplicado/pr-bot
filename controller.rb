@@ -46,7 +46,7 @@ class Controller < Autumn::Leaf
     
     database(:local) do
       if country then
-        set_country( nick, country, sender ) ? country : "error"
+        set_country( nick, country, sender ) ? get_country( nick ) : "error"
       else
         get_country( nick )
       end
@@ -71,7 +71,7 @@ class Controller < Autumn::Leaf
       end
       
       if ! hardcoded.nil? then
-        set_hardcoded( thing, hardcoded, sender ) ? ( hardcoded ? "hardcoded" : "not hardcoded" ) : "error"
+        set_hardcoded( thing, hardcoded, sender ) ? get_hardcoded( thing ) : "error"
       else
         get_hardcoded( thing )
       end
@@ -131,7 +131,7 @@ class Controller < Autumn::Leaf
     
     database(:local) do
       if ! ip.nil? then
-        set_server( name, ip, sender ) ? "updated" : "error"
+        set_server( name, ip, sender ) ? get_server( name ) : "error"
       else
         get_server( name )
       end
