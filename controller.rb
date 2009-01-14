@@ -12,14 +12,17 @@ require 'open-uri'
 require 'facets/random'
 require 'uri'
 
-
 class Controller < Autumn::Leaf
   before_filter :check_message, 
-                :except => [ :about, :latest, :hardcoded, :nuke, :jdam, :arty, 
+                :except => [ :about, :help, :latest, :hardcoded, :nuke, :jdam, :arty, 
                              :mortars, :ied, :grenade, :rifle, :sniper ]
   before_filter :downcase_message, :only => [ :leet, :hardcoded, :likesmen, :server ]
   
   def about_command(stem, sender, reply_to, msg)
+    "Hello, I'm a PR bot. I do cool things, so type !help for more info"
+  end
+  
+  def help_command(stem, sender, reply_to, msg)
   end
   
   def released_command(stem, sender, reply_to, msg)
