@@ -145,6 +145,10 @@ class Controller < Autumn::Leaf
     MAGIC8BALL.at_rand
   end
   
+  def magic_8ball_command(stem, sender, reply_to, msg)
+    magic_eight_ball_command(stem, sender, reply_to, msg)
+  end
+  
   def google_command(stem, sender, reply_to, msg)
     URI.escape("http://www.letmegooglethatforyou.com/?q=" + msg )
   end
