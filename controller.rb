@@ -145,7 +145,7 @@ class Controller < Autumn::Leaf
     MAGIC8BALL.at_rand
   end
   
-  def magic_8ball_command(stem, sender, reply_to, msg)
+  def magic8ball_command(stem, sender, reply_to, msg)
     magic_eight_ball_command(stem, sender, reply_to, msg)
   end
   
