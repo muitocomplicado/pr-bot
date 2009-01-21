@@ -190,13 +190,13 @@ class Controller < Autumn::Leaf
     end
     
     error = doc.at("//title").inner_html
-    return 'bad server address' if error.include?( "No Statistics Available" )
+    return 'no info for this server' if error.include?( "No Statistics Available" )
     
-    server = doc.at("//div[@class='server_header_title']").inner_html.strip
-    players = doc.at("//span[@id='HTML_num_players']").inner_html.strip
-    max = doc.at("//span[@id='HTML_max_players']").inner_html.strip
-    map = doc.at("//div[@class='si_map_header']").inner_html.strip
-    country = doc.at("//img[@class='flag']")['src'].match(/([a-z]{2})\.gif/i)[1].uppercase
+    server = doc.at("//div[@class='server_header_title']").inner_html.strip || "Unknown Server"
+    players = doc.at("//span[@id='HTML_num_players']").inner_html.strip || "?"
+    max = doc.at("//span[@id='HTML_max_players']").inner_html.strip || "?"
+    map = doc.at("//div[@class='si_map_header']").inner_html.strip || "Unknown Map"
+    country = doc.at("//img[@class='flag']")['src'].match(/([a-z]{2})\.gif/i)[1].uppercase || ""
     
     "%s | %d/%d %s | %s (by %s)" % [ server, players, max, map, country, s.added_by ]
     
