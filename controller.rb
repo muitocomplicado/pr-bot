@@ -199,15 +199,18 @@ class Controller < Autumn::Leaf
     error = doc.at("//title").inner_html
     return 'not available at gametracker.com' if error.include?( "No Statistics Available" )
     
+    h = Hash.new
+    
+    h['server'] = doc.at("//div[@class='server_header_title']").inner_html || "Unknown Server"
+    h['players'] = doc.at("//span[@id='HTML_num_players']").inner_html || "?"
+    h['max'] = doc.at("//span[@id='HTML_max_players']").inner_html || "?"
+    h['map'] = doc.at("//div[@class='si_map_header']").inner_html || "Unknown Map"
+    h['country'] = doc.at("//img[@class='flag']")['src'].match(/([a-z]{2})\.gif/i)[1].uppercase || ""
+    
     html = HTMLEntities.new
+    h.each_pair {|key, value| h[key] = html.decode( value.strip ) }
     
-    server = html.decode( doc.at("//div[@class='server_header_title']").inner_html.strip || "Unknown Server" )
-    players = html.decode( doc.at("//span[@id='HTML_num_players']").inner_html.strip || "?" )
-    max = html.decode( doc.at("//span[@id='HTML_max_players']").inner_html.strip || "?" )
-    map = html.decode( doc.at("//div[@class='si_map_header']").inner_html.strip || "Unknown Map" )
-    country = html.decode( doc.at("//img[@class='flag']")['src'].match(/([a-z]{2})\.gif/i)[1].uppercase || "" )
-    
-    "%s | %d/%d %s | %s (by %s)" % [ server, players, max, map, country, s.added_by ]
+    "%s | %d/%d %s | %s (by %s)" % [ h['server'], h['players'], h['max'], h['map'], h['country'], s.added_by ]
     
   end
   
