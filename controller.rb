@@ -5,17 +5,19 @@ require 'rubygems'
 gem 'hpricot', '~> 0.6.164'
 gem 'simple-rss', '~> 1.1'
 gem 'facets', '~> 2.5.0'
+gem 'htmlentities', '~> 4.0.0'
 
 require 'hpricot'
 require 'simple-rss'
 require 'open-uri'
 require 'facets/random'
 require 'uri'
+require 'htmlentities'
 
 class Controller < Autumn::Leaf
   before_filter :check_message, 
                 :except => [ :about, :help, :latest, :hardcoded, :nuke, :jdam, :arty, 
-                             :mortars, :ied, :grenade, :rifle, :sniper ]
+                             :mortars, :ied, :grenade, :rifle, :sniper, :cake ]
   before_filter :downcase_message, :only => [ :leet, :hardcoded, :likesmen, :server ]
   
   def about_command(stem, sender, reply_to, msg)
@@ -82,7 +84,7 @@ class Controller < Autumn::Leaf
   end
   
   def likesmen_command(stem, sender, reply_to, msg)
-    LIKESMEN.include?(msg) ? "yes" : ( LIKESMEN_NOWAY.include?(msg) ? "no" : "maybe" )
+    LIKESMEN.include?(msg) ? "yes" : ( LIKESMEN_NOWAY.include?(msg) ? "no" : LIKESMEN_PROBABLY.at_rand )
   end
   
   def latest_command(stem, sender, reply_to, msg)
@@ -120,6 +122,10 @@ class Controller < Autumn::Leaf
   
   def sniper_command(stem, sender, reply_to, msg)
     "BANG      CLACK-CLITCH"
+  end
+  
+  def cake_command(stem, sender, reply_to, msg)
+    "the cake is a lie"
   end
   
   def server_command(stem, sender, reply_to, msg)
@@ -165,6 +171,7 @@ class Controller < Autumn::Leaf
   
   LIKESMEN = [ 'rhino', 'katarn' ]
   LIKESMEN_NOWAY = [ 'dbzao' ]
+  LIKESMEN_PROBABLY = [ 'probably', 'maybe', 'almost certain', 'most likely', 'signs point to yes' ]
   
   MAGIC8BALL = [ "As I see it, yes", "It is certain", "It is decidedly so", "Most likely", "Outlook good", "Signs point to yes", "Without a doubt", "Yes", "Yes - definitely", "You may rely on it", "Ask again later", "Better not tell you now", "Cannot predict now", "Concentrate and ask again", "Reply hazy, try again", "Don't count on it", "My reply is no", "My sources say no", "Outlook not so good", "Very doubtful" ]
   
@@ -186,17 +193,19 @@ class Controller < Autumn::Leaf
       f = open("http://www.gametracker.com/server_info/#{s.ip}/")
       doc = Hpricot(f)
     rescue
-      return '404 bad server address'
+      return 'bad server address'
     end
     
     error = doc.at("//title").inner_html
-    return 'no info for this server' if error.include?( "No Statistics Available" )
+    return 'not available at gametracker.com' if error.include?( "No Statistics Available" )
     
-    server = doc.at("//div[@class='server_header_title']").inner_html.strip || "Unknown Server"
-    players = doc.at("//span[@id='HTML_num_players']").inner_html.strip || "?"
-    max = doc.at("//span[@id='HTML_max_players']").inner_html.strip || "?"
-    map = doc.at("//div[@class='si_map_header']").inner_html.strip || "Unknown Map"
-    country = doc.at("//img[@class='flag']")['src'].match(/([a-z]{2})\.gif/i)[1].uppercase || ""
+    html = HTMLEntities.new
+    
+    server = html.decode( doc.at("//div[@class='server_header_title']").inner_html.strip || "Unknown Server" )
+    players = html.decode( doc.at("//span[@id='HTML_num_players']").inner_html.strip || "?" )
+    max = html.decode( doc.at("//span[@id='HTML_max_players']").inner_html.strip || "?" )
+    map = html.decode( doc.at("//div[@class='si_map_header']").inner_html.strip || "Unknown Map" )
+    country = html.decode( doc.at("//img[@class='flag']")['src'].match(/([a-z]{2})\.gif/i)[1].uppercase || "" )
     
     "%s | %d/%d %s | %s (by %s)" % [ server, players, max, map, country, s.added_by ]
     
