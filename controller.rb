@@ -165,7 +165,7 @@ class Controller < Autumn::Leaf
   
   private
   
-  VERSIONS = [ 0.1, 0.2, 0.32, 0.4, 0.5, 0.6, 0.7, 0.75, 0.8 ]
+  VERSIONS = [ 0.1, 0.2, 0.32, 0.4, 0.5, 0.6, 0.7, 0.75, 0.8, 0.85 ]
   
   LEET = [ 'db', 'dbzao', 'ancientman', 'e-gor', 'prbot', 'projectreality', 'realitymod', 'pr', 'prm' ]
   
@@ -189,8 +189,10 @@ class Controller < Autumn::Leaf
     s = Server.get( name )
     return "sorry, I don't know that server, but you can add it using !server <name> <ip>:<port>" if s.nil?
     
+    url = "http://www.gametracker.com/server_info/#{s.ip}/"
+    
     begin
-      f = open("http://www.gametracker.com/server_info/#{s.ip}/")
+      f = open(url)
       doc = Hpricot(f)
     rescue
       return 'bad server address'
@@ -210,7 +212,7 @@ class Controller < Autumn::Leaf
     html = HTMLEntities.new
     h.each_pair {|key, value| h[key] = html.decode( value.strip ) }
     
-    "%s | %d/%d %s | %s (by %s)" % [ h['server'], h['players'], h['max'], h['map'], h['country'], s.added_by ]
+    "%s | %d/%d %s | %s (by %s) - %s" % [ h['server'], h['players'], h['max'], h['map'], h['country'], s.added_by, url ]
     
   end
   
