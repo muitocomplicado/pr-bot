@@ -212,7 +212,7 @@ class Controller < Autumn::Leaf
     html = HTMLEntities.new
     h.each_pair {|key, value| h[key] = html.decode( value.strip ) }
     
-    "%s | %d/%d %s | %s (by %s) - %s" % [ h['server'], h['players'], h['max'], h['map'], h['country'], s.added_by, url ]
+    "%s | %d/%d %s | %s - %s" % [ h['server'], h['players'], h['max'], h['map'], h['country'], url ]
     
   end
   
