@@ -147,6 +147,33 @@ class Controller < Autumn::Leaf
     end
   end
   
+  def player_command(stem, sender, reply_to, msg)
+    
+    html = HTMLEntities.new
+    url = "http://www.gametracker.com/search/bf2/?search_by=online_player&query=#{html.encode(msg)}"
+    
+    begin
+      f = open(url)
+      doc = Hpricot(f)
+    rescue
+      return 'bad server address'
+    end
+    
+    results = doc.search("//div[@class='results_row results_row_even']")
+    
+    if results && results.first.inner_html.match(/(No results found)/i) then
+      return "no results found"
+    end
+    
+    name = html.decode( results.search("//div[@class='results_op_c2']/a").first.inner_html )
+    server = results.search("//div[@class='results_op_c4']/a").first
+    server_name = html.decode( server.inner_html )
+    server_url = server['href']
+    
+    return name + ' -> ' + server_name + ' - ' + server_url
+    
+  end
+  
   def magic_eight_ball_command(stem, sender, reply_to, msg)
     MAGIC8BALL.at_rand
   end

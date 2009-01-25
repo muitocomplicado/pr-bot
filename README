@@ -10,6 +10,8 @@ Commands available:
 - !server <shortname> gets the current server status.
 - !server <shortname> <ip>:<port> registers the server with that shortname.
 
+- !player <nick> finds in what server this person is playing on.
+
 - !released <version_number> checks if a version was released. 
 
 - !hardcoded tells you something that is or not hardcoded.
