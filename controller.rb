@@ -240,23 +240,19 @@ class Controller < Autumn::Leaf
       open('http://realitymodfiles.com/egor/currentplayers.txt') { |f|
         f.each_line { |line| 
           if line =~ /^(.*)\s(([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)\:([0-9]+))\r\n$/i then
-            @players[$1.downcase] = $2
+            @players[$1] = $2
           end
         }
       }
       
     end
     
-    if @players.include?( name ) then
-      nickname = name
-    else
-      @players.each_key { |nick| 
-        if nick =~ /#{name}/i then
-          nickname = nick
-          break
-        end
-      }
-    end
+    @players.each_key { |nick| 
+      if nick =~ /#{name}/i then
+        nickname = nick
+        break
+      end
+    }
     
     if nickname.nil? then
       return 'player not found'
