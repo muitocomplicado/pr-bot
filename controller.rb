@@ -2,17 +2,15 @@
 
 require 'rubygems'
 
-gem 'hpricot', '~> 0.6.164'
+# gem 'hpricot', '~> 0.6.164'
 gem 'simple-rss', '~> 1.1'
 gem 'facets', '~> 2.5.0'
-gem 'htmlentities', '~> 4.0.0'
 
-require 'hpricot'
+# require 'hpricot'
 require 'simple-rss'
 require 'open-uri'
 require 'facets/random'
 require 'uri'
-require 'htmlentities'
 require 'time'
 
 class Controller < Autumn::Leaf
@@ -22,7 +20,7 @@ class Controller < Autumn::Leaf
   before_filter :downcase_message, :only => [ :leet, :hardcoded, :likesmen, :server, :player ]
   before_filter :strip_message
   
-  attr_accessor :players, :cache
+  attr_accessor :players, :servers, :cache_players, :cache_servers
   
   def about_command(stem, sender, reply_to, msg)
     "Hello, I'm a PR bot. I do cool things, so type !help for more info"
@@ -203,43 +201,37 @@ class Controller < Autumn::Leaf
   
   def get_server_info( address )
     
-    url = "http://www.gametracker.com/server_info/#{address}/"
-    
-    begin
-      f = open(url)
-      doc = Hpricot(f)
-    rescue
-      return 'bad server address'
+    if @cache_servers.nil? || @cache_servers < Time.now - 300 then
+      
+      @cache_servers = Time.now
+      @servers = Hash.new
+      
+      open('http://realitymodfiles.com/egor/currentservers.txt') { |f|
+        f.each_line { |line| 
+          if line =~ /^(.*)\s\|\|\s(([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)\:([0-9]+))\r\n$/i then
+            @servers[$2] = $1
+          end
+        }
+      }
+      
     end
     
-    error = doc.at("//title").inner_html
-    return 'not available at gametracker.com' if error.include?( "No Statistics Available" )
+    return 'server not found' if ! @servers.include?( address ) 
     
-    h = Hash.new
-    
-    h['server'] = doc.at("//div[@class='server_header_title']").inner_html || "Unknown Server"
-    h['players'] = doc.at("//span[@id='HTML_num_players']").inner_html || "?"
-    h['max'] = doc.at("//span[@id='HTML_max_players']").inner_html || "?"
-    h['map'] = doc.at("//div[@class='si_map_header']").inner_html || "Unknown Map"
-    h['country'] = doc.at("//img[@class='flag']")['src'].match(/([a-z]{2})\.gif/i)[1].uppercase || ""
-    
-    html = HTMLEntities.new
-    h.each_pair {|key, value| h[key] = html.decode( value.strip ) }
-    
-    "%s | %d/%d %s | %s - %s" % [ h['server'], h['players'], h['max'], h['map'], h['country'], url ]
+    @servers[address] + " || http://www.gametracker.com/server_info/#{address}/"
     
   end
   
   def get_player_info( name )
     
-    if @cache.nil? || @cache < Time.now - 300 then
+    if @cache_players.nil? || @cache_players < Time.now - 300 then
       
-      @cache = Time.now
+      @cache_players = Time.now
       @players = Hash.new
       
       open('http://realitymodfiles.com/egor/currentplayers.txt') { |f|
         f.each_line { |line| 
-          if line =~ /^(.*)\s(([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)\:([0-9]+))\r\n$/i then
+          if line =~ /^(.*)\s\-\>\s(.*)\r\n$/i then
             @players[$1] = $2
           end
         }
@@ -255,11 +247,9 @@ class Controller < Autumn::Leaf
       end
     }
     
-    if player_name.nil? then
-      return 'player not found'
-    else
-      return player_name + ' -> ' + get_server_info( @players[player_name].gsub(':29900',':16567' ) )
-    end
+    return 'player not found' if player_name.nil?
+      
+    player_name + ' -> ' + @players[player_name].gsub(':29900',':16567' )
     
   end
   
