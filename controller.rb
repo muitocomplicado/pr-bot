@@ -249,7 +249,7 @@ class Controller < Autumn::Leaf
     
     return 'player not found' if player_name.nil?
       
-    player_name + ' -> ' + @players[player_name].gsub(':29900',':16567' )
+    player_name.squeeze(" ") + ' -> ' + @players[player_name].gsub(':29900',':16567' )
     
   end
   
