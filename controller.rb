@@ -208,8 +208,8 @@ class Controller < Autumn::Leaf
       
       open('http://realitymodfiles.com/egor/currentservers.txt') { |f|
         f.each_line { |line| 
-          if line =~ /^(.*)\s\|\|\s(([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)\:([0-9]+))\r\n$/i then
-            @servers[$2] = $1
+          if line =~ /^(.*)\s+\|\|\s+(([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)\:([0-9]+))\r\n$/i then
+            @servers[$2] = $1.squeeze(" ")
           end
         }
       }
@@ -231,8 +231,8 @@ class Controller < Autumn::Leaf
       
       open('http://realitymodfiles.com/egor/currentplayers.txt') { |f|
         f.each_line { |line| 
-          if line =~ /^(.*)\s\-\>\s(.*)\r\n$/i then
-            @players[$1] = $2
+          if line =~ /^(.*)\s+\-\>\s+(.*)\r\n$/i then
+            @players[$1] = $2.squeeze(" ")
           end
         }
       }
@@ -241,7 +241,7 @@ class Controller < Autumn::Leaf
     
     player_name = nil
     @players.each_key { |nick| 
-      if nick =~ /#{name}/i then
+      if nick.downcase.include?( name ) then
         player_name = nick
         break
       end
