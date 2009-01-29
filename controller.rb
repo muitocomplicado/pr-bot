@@ -19,6 +19,7 @@ class Controller < Autumn::Leaf
                 :except => [ :about, :help, :latest, :hardcoded, :nuke, :jdam, :arty, 
                              :mortars, :ied, :grenade, :rifle, :sniper, :cake ]
   before_filter :downcase_message, :only => [ :leet, :hardcoded, :likesmen, :server ]
+  before_filter :strip_message
   
   def about_command(stem, sender, reply_to, msg)
     "Hello, I'm a PR bot. I do cool things, so type !help for more info"
@@ -307,6 +308,11 @@ class Controller < Autumn::Leaf
   
   def downcase_message_filter(stem, channel, sender, command, msg, opts)
     msg.downcase! if ! msg.nil?
+    true
+  end
+  
+  def strip_message_filter(stem, channel, sender, command, msg, opts)
+    msg.strip! if ! msg.nil?
     true
   end
   
