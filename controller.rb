@@ -247,17 +247,18 @@ class Controller < Autumn::Leaf
       
     end
     
+    player_name = nil
     @players.each_key { |nick| 
       if nick =~ /#{name}/i then
-        nickname = nick
+        player_name = nick
         break
       end
     }
     
-    if nickname.nil? then
+    if player_name.nil? then
       return 'player not found'
     else
-      return nickname + ' -> ' + get_server_info( @players[nickname].gsub(':29900',':16567' ) )
+      return player_name + ' -> ' + get_server_info( @players[player_name].gsub(':29900',':16567' ) )
     end
     
   end
