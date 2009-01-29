@@ -13,13 +13,16 @@ require 'open-uri'
 require 'facets/random'
 require 'uri'
 require 'htmlentities'
+require 'time'
 
 class Controller < Autumn::Leaf
   before_filter :check_message, 
                 :except => [ :about, :help, :latest, :hardcoded, :nuke, :jdam, :arty, 
                              :mortars, :ied, :grenade, :rifle, :sniper, :cake ]
-  before_filter :downcase_message, :only => [ :leet, :hardcoded, :likesmen, :server ]
+  before_filter :downcase_message, :only => [ :leet, :hardcoded, :likesmen, :server, :player ]
   before_filter :strip_message
+  
+  attr_accessor :players, :cache
   
   def about_command(stem, sender, reply_to, msg)
     "Hello, I'm a PR bot. I do cool things, so type !help for more info"
@@ -229,30 +232,37 @@ class Controller < Autumn::Leaf
   
   def get_player_info( name )
     
-    url = URI.escape( "http://www.gametracker.com/search/bf2/?search_by=online_player&query=#{name}" )
-    
-    begin
-      f = open(url)
-      doc = Hpricot(f)
-    rescue
-      return 'bad server address'
+    if @cache.nil? || @cache < Time.now - 300 then
+      
+      @cache = Time.now
+      @players = Hash.new
+      
+      open('http://realitymodfiles.com/egor/currentplayers.txt') { |f|
+        f.each_line { |line| 
+          if line =~ /^(.*)\s(([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)\:([0-9]+))\r\n$/i then
+            @players[$1.downcase] = $2
+          end
+        }
+      }
+      
     end
     
-    results = doc.search("//div[@class='results_row results_row_even']")
-    
-    if results && results.first.inner_html.match(/(No results found)/i) then
-      return "no results found"
+    if @players.include?( name ) then
+      nickname = name
+    else
+      @players.each_key { |nick| 
+        if nick =~ /#{name}/i then
+          nickname = nick
+          break
+        end
+      }
     end
     
-    html = HTMLEntities.new
-    
-    name = html.decode( results.search("//div[@class='results_op_c2']/a").first.inner_html )
-    server = results.search("//div[@class='results_op_c4']/a").first
-    server_name = html.decode( server.inner_html )
-    server_url = server['href']
-    server_address = server['href'].match(/(([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)\:([0-9]+))/i)[1]
-    
-    return name + ' -> ' + get_server_info( server_address )
+    if nickname.nil? then
+      return 'player not found'
+    else
+      return nickname + ' -> ' + get_server_info( @players[nickname].gsub(':29900',':16567' ) )
+    end
     
   end
   
