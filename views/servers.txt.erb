@@ -1,0 +1,7 @@
+<% if var(:servers).length == 0 then %>
+  servers not found or empty
+<% else %>
+  <% var(:servers).each do |info| %>
+    <%= info %>
+  <% end %>
+<% end %>

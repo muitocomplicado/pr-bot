@@ -17,7 +17,8 @@ class Controller < Autumn::Leaf
   before_filter :check_message, 
                 :except => [ :about, :help, :latest, :hardcoded, :nuke, :jdam, :arty, 
                              :mortars, :ied, :grenade, :rifle, :sniper, :cake ]
-  before_filter :downcase_message, :only => [ :leet, :hardcoded, :likesmen, :server, :player ]
+  before_filter :downcase_message, 
+                :only => [ :leet, :hardcoded, :likesmen, :server, :servers, :player, :players ]
   before_filter :strip_message
   
   attr_accessor :players, :servers, :cache_players, :cache_servers
@@ -94,6 +95,77 @@ class Controller < Autumn::Leaf
     var :rss => rss.items[0..4]
   end
   
+  def server_command(stem, sender, reply_to, msg)
+    if msg =~ /^(.*)\s+(([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)\:([0-9]+))$/i then
+      name = $1.downcase
+      ip = $2
+      # ip = "64.34.161.157:16567"
+    else
+      name = msg
+      ip = nil
+    end
+    
+    database(:local) do
+      if ! ip.nil? then
+        set_server( name, ip, sender ) ? get_server( name ) : "error"
+      else
+        get_server( name )
+      end
+    end
+  end
+  
+  def servers_command(stem, sender, reply_to, msg)
+    
+    database(:local) do
+      
+      ips = []
+      servers = Server.all( :name => msg.split(' ') )
+      
+      if servers then
+        servers.each { |s| ips << s.ip }
+      end
+      
+      ips.slice!(0,5) if ips.length > 5
+      
+      return 'servers not found or empty' if ips.empty?
+      
+      servers = []
+      ips.each { |ip| 
+        info = get_server_info( ip )
+        servers << info if info
+      }
+      var :servers => servers
+      
+    end
+    
+  end
+  
+  def player_command(stem, sender, reply_to, msg)
+    players = get_player_info( msg )
+    players[0] || 'player not found or offline'
+  end
+  
+  def players_command(stem, sender, reply_to, msg)
+    players = get_player_info( msg )
+    var :players => players
+  end
+  
+  def magic_eight_ball_command(stem, sender, reply_to, msg)
+    MAGIC8BALL.at_rand
+  end
+  
+  def magic8ball_command(stem, sender, reply_to, msg)
+    magic_eight_ball_command(stem, sender, reply_to, msg)
+  end
+  
+  def m8b_command(stem, sender, reply_to, msg)
+    magic_eight_ball_command(stem, sender, reply_to, msg)
+  end
+  
+  def google_command(stem, sender, reply_to, msg)
+    URI.escape("http://www.letmegooglethatforyou.com/?q=" + msg )
+  end
+  
   def nuke_command(stem, sender, reply_to, msg)
     "KABOOOOOOOOOOOOOOMMMMMMMMMMMMM"
   end
@@ -130,45 +202,6 @@ class Controller < Autumn::Leaf
     "the cake is a lie"
   end
   
-  def server_command(stem, sender, reply_to, msg)
-    if msg =~ /^(.*)\s+(([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)\:([0-9]+))$/i then
-      name = $1.downcase
-      ip = $2
-      # ip = "64.34.161.157:16567"
-    else
-      name = msg
-      ip = nil
-    end
-    
-    database(:local) do
-      if ! ip.nil? then
-        set_server( name, ip, sender ) ? get_server( name ) : "error"
-      else
-        get_server( name )
-      end
-    end
-  end
-  
-  def player_command(stem, sender, reply_to, msg)
-    get_player_info( msg )
-  end
-  
-  def magic_eight_ball_command(stem, sender, reply_to, msg)
-    MAGIC8BALL.at_rand
-  end
-  
-  def magic8ball_command(stem, sender, reply_to, msg)
-    magic_eight_ball_command(stem, sender, reply_to, msg)
-  end
-  
-  def m8b_command(stem, sender, reply_to, msg)
-    magic_eight_ball_command(stem, sender, reply_to, msg)
-  end
-  
-  def google_command(stem, sender, reply_to, msg)
-    URI.escape("http://www.letmegooglethatforyou.com/?q=" + msg )
-  end
-  
   private
   
   VERSIONS = [ 0.1, 0.2, 0.32, 0.4, 0.5, 0.6, 0.7, 0.75, 0.8, 0.85 ]
@@ -195,7 +228,7 @@ class Controller < Autumn::Leaf
     s = Server.get( name )
     return "sorry, I don't know that server, but you can add it using !server <name> <ip>:<port>" if s.nil?
     
-    get_server_info( s.ip )
+    get_server_info( s.ip ) || "server not found or empty"
     
   end
   
@@ -216,9 +249,7 @@ class Controller < Autumn::Leaf
       
     end
     
-    return 'server not found' if ! @servers.include?( address ) 
-    
-    @servers[address] + " || http://www.gametracker.com/server_info/#{address}/"
+    @servers[address]
     
   end
   
@@ -239,17 +270,15 @@ class Controller < Autumn::Leaf
       
     end
     
-    player_name = nil
-    @players.each_key { |nick| 
+    players = []
+    @players.each_pair { |nick, info| 
       if nick.downcase.include?( name ) then
-        player_name = nick
-        break
+        players << nick.squeeze(" ") + ' -> ' + info
+        break if players.length == 5
       end
     }
     
-    return 'player not found' if player_name.nil?
-      
-    player_name.squeeze(" ") + ' -> ' + @players[player_name].gsub(':29900',':16567' )
+    players
     
   end
   
