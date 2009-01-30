@@ -16,7 +16,7 @@ require 'time'
 class Controller < Autumn::Leaf
   before_filter :check_message, 
                 :except => [ :about, :help, :latest, :hardcoded, :nuke, :jdam, :arty, 
-                             :mortars, :ied, :grenade, :rifle, :sniper, :cake, :topservers ]
+                             :mortars, :ied, :grenade, :rifle, :sniper, :cake ]
   before_filter :downcase_message, 
                 :only => [ :leet, :hardcoded, :likesmen, :server, :servers, :player, :players ]
   before_filter :strip_message
@@ -138,14 +138,6 @@ class Controller < Autumn::Leaf
       
     end
     
-  end
-  
-  def topservers_command(stem, sender, reply_to, msg)
-    update_servers_cache
-    top5 = @servers.values.slice(0,5)
-    
-    var :servers => top5
-    render :servers and return
   end
   
   def player_command(stem, sender, reply_to, msg)
