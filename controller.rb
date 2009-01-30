@@ -21,7 +21,7 @@ class Controller < Autumn::Leaf
                 :only => [ :leet, :hardcoded, :likesmen, :server, :servers, :player, :players ]
   before_filter :strip_message
   
-  attr_accessor :players, :servers, :cache_players, :cache_servers
+  # attr_accessor :players, :servers, :cache_players, :cache_servers
   
   def about_command(stem, sender, reply_to, msg)
     "Hello, I'm a PR bot. I do cool things, so type !help for more info"
@@ -119,35 +119,41 @@ class Controller < Autumn::Leaf
     database(:local) do
       
       ips = []
-      servers = Server.all( :name => msg.split(' ') )
+      list = Server.all( :name => msg.split(' ') )
       
-      if servers then
-        servers.each { |s| ips << s.ip }
+      if list then
+        list.each { |s| ips << s.ip }
       end
-      
-      ips.slice!(0,5) if ips.length > 5
       
       return 'servers not found or empty' if ips.empty?
       
-      servers = []
+      list = []
       ips.each { |ip| 
         info = get_server_info( ip )
-        servers << info if info
+        list << info if info
       }
-      var :servers => servers
+      
+      list = list.slice(0,5) if list.length > 5
+      var :servers => list
       
     end
     
   end
   
   def player_command(stem, sender, reply_to, msg)
-    players = get_player_info( msg )
-    players[0] || 'player not found or offline'
+    get_player_info( msg ) || 'player not found or offline'
   end
   
   def players_command(stem, sender, reply_to, msg)
-    players = get_player_info( msg )
-    var :players => players
+    
+    list = []
+    msg.split(' ').each{ |name|
+      list = list | get_player_info( name, true )
+    }
+    
+    list = list.slice(0,5) if list.length > 5
+    var :players => list
+    
   end
   
   def magic_eight_ball_command(stem, sender, reply_to, msg)
@@ -253,7 +259,7 @@ class Controller < Autumn::Leaf
     
   end
   
-  def get_player_info( name )
+  def get_player_info( name, multiple=false )
     
     if @cache_players.nil? || @cache_players < Time.now - 300 then
       
@@ -263,22 +269,22 @@ class Controller < Autumn::Leaf
       open('http://realitymodfiles.com/egor/currentplayers.txt') { |f|
         f.each_line { |line| 
           if line =~ /^(.*)\s+\-\>\s+(.*)\r\n$/i then
-            @players[$1] = $2.squeeze(" ")
+            @players[$1.squeeze(" ").strip] = $2.squeeze(" ")
           end
         }
       }
       
     end
     
-    players = []
-    @players.each_pair { |nick, info| 
+    res = []
+    @players.each_pair { |nick, info|
       if nick.downcase.include?( name ) then
-        players << nick.squeeze(" ") + ' -> ' + info
-        break if players.length == 5
+        res << ( nick + ' -> ' + info )
+        return res[0] unless multiple
       end
     }
     
-    players
+    res
     
   end
   
