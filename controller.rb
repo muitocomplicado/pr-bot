@@ -16,7 +16,7 @@ require 'time'
 class Controller < Autumn::Leaf
   before_filter :check_message, 
                 :except => [ :about, :help, :latest, :hardcoded, :nuke, :jdam, :arty, 
-                             :mortars, :ied, :grenade, :rifle, :sniper, :cake ]
+                             :mortars, :ied, :grenade, :rifle, :sniper, :cake, :topservers ]
   before_filter :downcase_message, 
                 :only => [ :leet, :hardcoded, :likesmen, :server, :servers, :player, :players ]
   before_filter :strip_message
@@ -140,6 +140,14 @@ class Controller < Autumn::Leaf
     
   end
   
+  def topservers_command(stem, sender, reply_to, msg)
+    update_servers_cache
+    top5 = @servers.values.slice(0,5)
+    
+    var :servers => top5
+    render :servers and return
+  end
+  
   def player_command(stem, sender, reply_to, msg)
     get_player_info( msg ) || 'player not found'
   end
@@ -242,8 +250,7 @@ class Controller < Autumn::Leaf
     
   end
   
-  def get_server_info( address )
-    
+  def update_servers_cache
     if @cache_servers.nil? || @cache_servers < Time.now - 300 then
       
       @cache_servers = Time.now
@@ -258,13 +265,9 @@ class Controller < Autumn::Leaf
       }
       
     end
-    
-    @servers[address]
-    
   end
   
-  def get_player_info( name, multiple=false )
-    
+  def update_players_cache
     if @cache_players.nil? || @cache_players < Time.now - 300 then
       
       @cache_players = Time.now
@@ -279,6 +282,15 @@ class Controller < Autumn::Leaf
       }
       
     end
+  end
+  
+  def get_server_info( address )
+    update_servers_cache
+    @servers[address]
+  end
+  
+  def get_player_info( name, multiple=false )
+    update_players_cache
     
     res = []
     @players.each_pair { |nick, info|
@@ -288,11 +300,7 @@ class Controller < Autumn::Leaf
       end
     }
     
-    if multiple then
-      res
-    else
-      nil
-    end
+    if multiple then res else nil end
     
   end
   

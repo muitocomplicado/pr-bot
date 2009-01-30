@@ -9,10 +9,11 @@ Commands available:
 
 - !server <shortname> gets the current server status.
 - !server <shortname> <ip>:<port> registers the server with that shortname.
-- !servers <shortname> <shortname> ... <shortname> returns servers information (max 5)
+- !servers <shortname> <shortname> ... <shortname> returns servers information (max 5).
+- !topservers lists the top 5 servers in player population.
 
 - !player <nick> finds in what server this person is playing on.
-- !players <nick> <nick> ... <nick> returns players server information (max 5)
+- !players <nick> <nick> ... <nick> returns players server information (max 5).
 
 - !released <version_number> checks if a version was released. 
 
