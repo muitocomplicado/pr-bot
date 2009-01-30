@@ -288,7 +288,11 @@ class Controller < Autumn::Leaf
       end
     }
     
-    res
+    if multiple then
+      res
+    else
+      nil
+    end
     
   end
   
