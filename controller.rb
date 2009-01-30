@@ -125,7 +125,7 @@ class Controller < Autumn::Leaf
         list.each { |s| ips << s.ip }
       end
       
-      return 'servers not found or empty' if ips.empty?
+      return 'servers are empty' if ips.empty?
       
       list = []
       ips.each { |ip| 
@@ -141,7 +141,7 @@ class Controller < Autumn::Leaf
   end
   
   def player_command(stem, sender, reply_to, msg)
-    get_player_info( msg ) || 'player not found or offline'
+    get_player_info( msg ) || 'player not found'
   end
   
   def players_command(stem, sender, reply_to, msg)
@@ -165,6 +165,10 @@ class Controller < Autumn::Leaf
   end
   
   def m8b_command(stem, sender, reply_to, msg)
+    magic_eight_ball_command(stem, sender, reply_to, msg)
+  end
+  
+  def prbot_command(stem, sender, reply_to, msg)
     magic_eight_ball_command(stem, sender, reply_to, msg)
   end
   
@@ -234,7 +238,7 @@ class Controller < Autumn::Leaf
     s = Server.get( name )
     return "sorry, I don't know that server, but you can add it using !server <name> <ip>:<port>" if s.nil?
     
-    get_server_info( s.ip ) || "server not found or empty"
+    get_server_info( s.ip ) || "server is empty"
     
   end
   
