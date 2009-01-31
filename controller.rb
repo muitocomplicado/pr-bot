@@ -16,9 +16,9 @@ require 'time'
 class Controller < Autumn::Leaf
   before_filter :check_message, 
                 :except => [ :about, :help, :latest, :hardcoded, :nuke, :jdam, :arty, 
-                             :mortars, :ied, :grenade, :rifle, :sniper, :cake ]
+                             :mortars, :ied, :grenade, :rifle, :sniper, :cake, :buddies, :buddy ]
   before_filter :downcase_message, 
-                :only => [ :leet, :hardcoded, :likesmen, :server, :servers, :player, :players ]
+                :only => [ :leet, :hardcoded, :likesmen, :server, :servers, :player, :players, :buddy ]
   before_filter :strip_message
   
   # attr_accessor :players, :servers, :cache_players, :cache_servers
@@ -39,6 +39,27 @@ class Controller < Autumn::Leaf
       LEET.include?(msg) ? "yes" : "no way"
     else
       "type only a nickname"
+    end
+  end
+  
+  def buddy_command(stem, sender, reply_to, msg)
+    database(:local) do
+      if msg.nil? then
+        get_buddies( sender[:nick] ) || buddies_error
+      else
+        set_buddies( sender[:nick], msg.split(' ') ) ? ( get_buddies( sender[:nick] ) || buddies_error ) : "error"
+      end
+    end
+  end
+  
+  def buddies_command(stem, sender, reply_to, msg)
+    database(:local) do
+      list = get_buddies( sender[:nick] )
+      if list
+        players_command(stem, sender, reply_to, list)
+      else
+        buddies_error
+      end
     end
   end
   
@@ -145,7 +166,6 @@ class Controller < Autumn::Leaf
   end
   
   def players_command(stem, sender, reply_to, msg)
-    
     list = []
     msg.split(' ').each{ |name|
       list = list | get_player_info( name, true )
@@ -153,7 +173,7 @@ class Controller < Autumn::Leaf
     
     list = list.slice(0,5) if list.length > 5
     var :players => list
-    
+    render :players
   end
   
   def magic_eight_ball_command(stem, sender, reply_to, msg)
@@ -236,7 +256,7 @@ class Controller < Autumn::Leaf
   def get_server( name )
     
     s = Server.get( name )
-    return "sorry, I don't know that server, but you can add it using !server <name> <ip>:<port>" if s.nil?
+    return "I don't know that server, but you can add it using !server <name> <ip>:<port>" if s.nil?
     
     get_server_info( s.ip ) || "server is empty"
     
@@ -267,8 +287,8 @@ class Controller < Autumn::Leaf
       
       open('http://realitymodfiles.com/egor/currentplayers.txt') { |f|
         f.each_line { |line| 
-          if line =~ /^(.*)\s+\|\|\s+(([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)\:([0-9]+))\r\n$/i then
-            @players[$1.squeeze(" ").strip] = $2
+          if line =~ /^(.*)\s+\|\|\s+(.*)\s+\|\|\s+(([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)\:([0-9]+))\r\n$/i then
+            @players[$1.squeeze(" ").strip] = $3
           end
         }
       }
@@ -310,7 +330,7 @@ class Controller < Autumn::Leaf
     if h
       ( h.hardcoded ? "yes" : "no" ) + " (by " + h.added_by + ")"
     else
-      "sorry, I don't know, but you can tell me using !hardcoded <thing> true|false"
+      "I don't know, but you can tell me using !hardcoded <thing> true|false"
     end
   end
   
@@ -333,8 +353,32 @@ class Controller < Autumn::Leaf
     if c
       c.country + " (by " + c.added_by + ")"
     else
-      "sorry, I don't know, but you can add it using !country <nick> <country>"
+      "I don't know, but you can add it using !country <nick> <country>"
     end
+  end
+  
+  def get_buddies( nick )
+    b = Buddies.all( :nick => nick )
+    if b and b.length > 0 then
+      list = []
+      b.each { |buddy| list << buddy.buddy }
+      list.join(' ')
+    end
+  end
+  
+  def set_buddies( nick, buddies )
+    buddies.each { |buddy|
+      b = Buddies.get( nick, buddy )
+      if b
+        b.destroy
+      else
+        Buddies.create( :nick => nick, :buddy => buddy )
+      end
+    }
+  end
+  
+  def buddies_error
+    "No buddies registered for you, but you can add some using !buddy <nick>"
   end
   
   def check_message_filter(stem, channel, sender, command, msg, opts)
