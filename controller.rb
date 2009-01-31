@@ -267,8 +267,8 @@ class Controller < Autumn::Leaf
       
       open('http://realitymodfiles.com/egor/currentplayers.txt') { |f|
         f.each_line { |line| 
-          if line =~ /^(.*)\s+\-\>\s+(.*)\r\n$/i then
-            @players[$1.squeeze(" ").strip] = $2.squeeze(" ")
+          if line =~ /^(.*)\s+\|\|\s+(([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)\:([0-9]+))\r\n$/i then
+            @players[$1.squeeze(" ").strip] = $2
           end
         }
       }
@@ -285,9 +285,9 @@ class Controller < Autumn::Leaf
     update_players_cache
     
     res = []
-    @players.each_pair { |nick, info|
+    @players.each_pair { |nick, address|
       if nick.downcase.include?( name ) then
-        res << ( nick + ' -> ' + info )
+        res << ( nick + ' -> ' + get_server_info(address) )
         return res[0] unless multiple
       end
     }
