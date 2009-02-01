@@ -14,8 +14,7 @@ Commands available:
 - !player <nick> finds in what server this person is playing on.
 - !players <nick> <nick> ... <nick> returns players server information (max 5).
 
-- !buddy returns your buddy list.
-- !buddy <nick> adds or removes a buddy to your list.
+- !buddies <nick> <nick> ... <nick> adds or removes a buddy to your list.
 - !buddies returns the servers your buddies are playing on.
 
 - !released <version_number> checks if a version was released. 

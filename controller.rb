@@ -16,12 +16,10 @@ require 'time'
 class Controller < Autumn::Leaf
   before_filter :check_message, 
                 :except => [ :about, :help, :latest, :hardcoded, :nuke, :jdam, :arty, 
-                             :mortars, :ied, :grenade, :rifle, :sniper, :cake, :buddies, :buddy ]
+                             :mortars, :ied, :grenade, :rifle, :sniper, :cake, :buddies ]
   before_filter :downcase_message, 
-                :only => [ :leet, :hardcoded, :likesmen, :server, :servers, :player, :players, :buddy ]
+                :only => [ :leet, :hardcoded, :likesmen, :server, :servers, :player, :players, :buddies ]
   before_filter :strip_message
-  
-  # attr_accessor :players, :servers, :cache_players, :cache_servers
   
   def about_command(stem, sender, reply_to, msg)
     "Hello, I'm a PR bot. I do cool things, so type !help for more info"
@@ -42,23 +40,17 @@ class Controller < Autumn::Leaf
     end
   end
   
-  def buddy_command(stem, sender, reply_to, msg)
-    database(:local) do
-      if msg.nil? then
-        get_buddies( sender[:nick] ) || buddies_error
-      else
-        set_buddies( sender[:nick], msg.split(' ') ) ? ( get_buddies( sender[:nick] ) || buddies_error ) : "error"
-      end
-    end
-  end
-  
   def buddies_command(stem, sender, reply_to, msg)
     database(:local) do
-      list = get_buddies( sender[:nick] )
-      if list
-        players_command(stem, sender, reply_to, list)
+      if msg then
+        set_buddies( sender[:nick], msg.split(' ') ) ? ( get_buddies( sender[:nick] ) || buddies_error ) : "error"
       else
-        buddies_error
+        list = get_buddies( sender[:nick] )
+        if list
+          players_command(stem, sender, reply_to, list)
+        else
+          buddies_error
+        end
       end
     end
   end
