@@ -370,7 +370,7 @@ class Controller < Autumn::Leaf
   end
   
   def buddies_error
-    "No buddies registered for you, but you can add some using !buddy <nick>"
+    "No buddies registered for you, but you can add some using !buddies <nick> <nick> ... <nick>"
   end
   
   def check_message_filter(stem, channel, sender, command, msg, opts)
