@@ -16,7 +16,7 @@ require 'time'
 class Controller < Autumn::Leaf
   before_filter :check_message, 
                 :except => [ :about, :help, :latest, :hardcoded, :nuke, :jdam, :arty, 
-                             :mortars, :ied, :grenade, :rifle, :sniper, :cake, :buddies ]
+                             :mortars, :ied, :grenade, :rifle, :sniper, :cake, :buddies, :buddylist ]
   before_filter :downcase_message, 
                 :only => [ :leet, :hardcoded, :likesmen, :server, :servers, :player, :players, :buddies ]
   before_filter :strip_message
@@ -37,6 +37,12 @@ class Controller < Autumn::Leaf
       LEET.include?(msg) ? "yes" : "no way"
     else
       "type only a nickname"
+    end
+  end
+  
+  def buddylist_command(stem, sender, reply_to, msg)
+    database(:local) do
+      get_buddies( sender[:nick] ) || buddies_error
     end
   end
   

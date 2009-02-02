@@ -16,6 +16,7 @@ Commands available:
 
 - !buddies <nick> <nick> ... <nick> adds or removes a buddy to your list.
 - !buddies returns the servers your buddies are playing on.
+- !buddylist returns the list of your registered buddies.
 
 - !released <version_number> checks if a version was released. 
 
