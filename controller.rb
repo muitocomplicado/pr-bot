@@ -191,7 +191,7 @@ class Controller < Autumn::Leaf
   end
   
   def google_command(stem, sender, reply_to, msg)
-    URI.escape("http://www.letmegooglethatforyou.com/?q=" + msg )
+    URI.escape("http://www.lmgtfy.com/?q=" + msg )
   end
   
   def nuke_command(stem, sender, reply_to, msg)
