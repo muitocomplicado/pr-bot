@@ -18,7 +18,7 @@ class Controller < Autumn::Leaf
                 :except => [ :about, :help, :latest, :hardcoded, :nuke, :jdam, :arty, 
                              :mortars, :ied, :grenade, :rifle, :sniper, :cake, :buddies, :buddylist, :commands ]
   before_filter :downcase_message, 
-                :only => [ :leet, :hardcoded, :likesmen, :server, :servers, :player, :players, :buddies ]
+                :only => [ :leet, :fail, :hardcoded, :likesmen, :server, :servers, :player, :players, :buddies ]
   before_filter :strip_message
   
   def about_command(stem, sender, reply_to, msg)
@@ -35,6 +35,15 @@ class Controller < Autumn::Leaf
   def leet_command(stem, sender, reply_to, msg)
     if msg =~ /^(\S+)$/i then
       LEET.include?(msg) ? "yes" : "no way"
+    else
+      "type only a nickname"
+    end
+  end
+  
+  def fail_command(stem, sender, reply_to, msg)
+    if msg =~ /^(\S+)$/i then
+      fail = [ '', 'epic', 'uber', 'mega', 'super', 'hyper', 'constant', 'exponential', 'unlimited', 'breaking', 'ugly', 'jedi', 'vader', 'concrete', 'pirate', 'ninja (no way)']
+      msg + ' ' + fail.at_rand + ' fail'
     else
       "type only a nickname"
     end
@@ -268,7 +277,7 @@ class Controller < Autumn::Leaf
       
       open('http://realitymodfiles.com/egor/currentservers.txt') { |f|
         f.each_line { |line| 
-          if line =~ /^(.*)\s+\|\|\s+(([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)\:([0-9]+))\r\n$/i then
+          if line =~ /^(.*)\s+\|\|\s+(([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)\:([0-9]+))/i then
             @servers[$2] = $1.squeeze(" ")
           end
         }
@@ -285,7 +294,7 @@ class Controller < Autumn::Leaf
       
       open('http://realitymodfiles.com/egor/currentplayers.txt') { |f|
         f.each_line { |line| 
-          if line =~ /^(.*)\s+\|\|\s+(.*)\s+\|\|\s+(([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)\:([0-9]+))\r\n$/i then
+          if line =~ /^(.*)\s+\|\|\s+(.*)\s+\|\|\s+(([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)\:([0-9]+))/i then
             @players[$1.squeeze(" ").strip] = $3
           end
         }

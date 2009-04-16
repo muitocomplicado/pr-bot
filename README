@@ -26,6 +26,7 @@ Commands available:
 - !country <nick> [country] gets or sets the country of that person.
 
 - !leet <nick> tells you if somebody is leet.
+- !fail <nick> tells you how much that person fails.
 
 - !likesmen <nick> tells you if somebody likes men.
 
