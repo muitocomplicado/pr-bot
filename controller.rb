@@ -15,14 +15,14 @@ require 'time'
 
 class Controller < Autumn::Leaf
   before_filter :check_message, 
-                :except => [ :about, :help, :latest, :hardcoded, :nuke, :jdam, :arty, 
+                :except => [ :about, :help, :fail, :latest, :hardcoded, :nuke, :jdam, :arty, 
                              :mortars, :ied, :grenade, :rifle, :sniper, :cake, :buddies, :buddylist, :commands ]
   before_filter :downcase_message, 
-                :only => [ :leet, :fail, :hardcoded, :likesmen, :server, :servers, :player, :players, :buddies ]
+                :only => [ :leet, :hardcoded, :likesmen, :server, :servers, :player, :players, :buddies ]
   before_filter :strip_message
   
   def about_command(stem, sender, reply_to, msg)
-    "Hello, I'm a PR bot. I do cool things, so type !help for more info"
+    help_command(stem, sender, reply_to, msg)
   end
   
   def help_command(stem, sender, reply_to, msg)
@@ -41,12 +41,7 @@ class Controller < Autumn::Leaf
   end
   
   def fail_command(stem, sender, reply_to, msg)
-    if msg =~ /^(\S+)$/i then
-      fail = [ '', 'epic', 'uber', 'mega', 'super', 'hyper', 'constant', 'exponential', 'unlimited', 'breaking', 'ugly', 'jedi', 'vader', 'concrete', 'pirate', 'ninja (no way)']
-      msg + ' ' + fail.at_rand + ' fail'
-    else
-      "type only a nickname"
-    end
+    msg + ' ' + [ '', 'epic', 'uber', 'mega', 'super', 'hyper', 'constant', 'exponential', 'unlimited', 'breaking', 'ugly', 'dark force', 'wow', 'concrete', 'pirate' ].at_rand + ' fail'
   end
   
   def buddylist_command(stem, sender, reply_to, msg)
