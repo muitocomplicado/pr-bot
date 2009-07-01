@@ -18,7 +18,7 @@ class Controller < Autumn::Leaf
                 :except => [ :about, :help, :fail, :latest, :hardcoded, :nuke, :jdam, :arty, 
                              :mortars, :ied, :grenade, :rifle, :sniper, :cake, :buddies, :buddylist, :commands ]
   before_filter :downcase_message, 
-                :only => [ :leet, :hardcoded, :likesmen, :server, :servers, :player, :players, :buddies ]
+                :only => [ :leet, :hardcoded, :likesmen, :server, :servers, :player, :players, :buddies, :decide ]
   before_filter :strip_message
   
   def about_command(stem, sender, reply_to, msg)
@@ -28,8 +28,17 @@ class Controller < Autumn::Leaf
   def help_command(stem, sender, reply_to, msg)
   end
   
+  def release_command(stem, sender, reply_to, msg)
+    if VERSIONS_ALMOST.include?(msg.to_f) then
+      "Alright, I'll submit your request to release " + msg + " but it may take some time, I am quite busy..."
+    else
+      "You fail..."
+    end
+  end
+  
   def released_command(stem, sender, reply_to, msg)
-    VERSIONS.include?(msg.to_f) ? "yes" : "no"
+    # VERSIONS.include?(msg.to_f) ? "yes" : "no"
+    VERSIONS.include?(msg.to_f) ? "yes" : ( VERSIONS_ALMOST.include?(msg.to_f) ? "IMMINENTLY!!!" : "no" )
   end
   
   def leet_command(stem, sender, reply_to, msg)
@@ -178,6 +187,20 @@ class Controller < Autumn::Leaf
     render :players
   end
   
+  def decide_command(stem, sender, reply_to, msg)
+    if msg.include? ',' or msg.include? ' or ' then
+      decision = msg.gsub(', or', ' or ').gsub(',or', ' or ').gsub(',', ' or ').gsub('?', '').gsub('should i ', '').gsub('should we ', '')
+      decision = decision.split(' or ').at_rand.capitalize.strip
+      if decision == '' or decision.downcase ==  'or' then
+        'Sorry, I don\'t know :('
+      else
+        decision
+      end
+    else
+      'You could at least type the question properly...'
+    end
+  end
+  
   def magic_eight_ball_command(stem, sender, reply_to, msg)
     MAGIC8BALL.at_rand
   end
@@ -236,15 +259,16 @@ class Controller < Autumn::Leaf
   
   private
   
-  VERSIONS = [ 0.1, 0.2, 0.32, 0.4, 0.5, 0.6, 0.7, 0.75, 0.8, 0.85 ]
+  VERSIONS = [ 0.1, 0.2, 0.32, 0.4, 0.5, 0.6, 0.7, 0.75, 0.8, 0.85, 0.86 ]
+  VERSIONS_ALMOST = []
   
-  LEET = [ 'db', 'dbzao', 'ancientman', 'e-gor', 'prbot', 'projectreality', 'realitymod', 'pr', 'prm' ]
+  LEET = [ 'db', 'dbzao', 'ancientman', 'afterdune', 'e-gor',  'masaq', 'prbot', 'projectreality', 'realitymod', 'pr', 'prm' ]
   
   LIKESMEN = [ 'rhino', 'katarn' ]
-  LIKESMEN_NOWAY = [ 'dbzao' ]
+  LIKESMEN_NOWAY = [ 'dbzao', 'ancientman' ]
   LIKESMEN_PROBABLY = [ 'probably', 'maybe', 'almost certain', 'most likely', 'signs point to yes' ]
   
-  MAGIC8BALL = [ "As I see it, yes", "It is certain", "It is decidedly so", "Most likely", "Outlook good", "Signs point to yes", "Without a doubt", "Yes", "Yes - definitely", "You may rely on it", "Ask again later", "Better not tell you now", "Cannot predict now", "Concentrate and ask again", "Reply hazy, try again", "Don't count on it", "My reply is no", "My sources say no", "Outlook not so good", "Very doubtful" ]
+  MAGIC8BALL = [ "As I see it, yes", "It is certain", "It is decidedly so", "Most likely", "Outlook good", "Signs point to yes", "Without a doubt", "Yes", "Yes - definitely", "You may rely on it", "Ask again later", "Better not tell you now", "Cannot predict now", "Concentrate and ask again", "Reply hazy, try again", "Don't count on it", "My reply is no", "My sources say no", "Outlook not so good", "Very doubtful", "You're retarded, I'm not answering that question" ]
   
   def set_server( name, ip, sender )
     s = Server.get( name )

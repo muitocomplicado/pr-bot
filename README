@@ -19,11 +19,14 @@ Commands available:
 - !buddylist returns the list of your registered buddies.
 
 - !released <version_number> checks if a version was released. 
+- !release <version_number> tells the bot to release a new version.
 
 - !hardcoded tells you something that is or not hardcoded.
 - !hardcoded <something> [true|false] gets or sets if that thing is hardcoded.
 
 - !country <nick> [country] gets or sets the country of that person.
+
+- !decide <some_thing> or <other_thing>
 
 - !leet <nick> tells you if somebody is leet.
 - !fail <something> tells you how much something (or someone) fails.
