@@ -50,7 +50,7 @@ class Controller < Autumn::Leaf
   end
   
   def fail_command(stem, sender, reply_to, msg)
-    msg + ' ' + [ '', 'epic', 'uber', 'mega', 'super', 'hyper', 'constant', 'exponential', 'unlimited', 'breaking', 'ugly', 'dark force', 'wow', 'concrete', 'pirate' ].at_rand + ' fail'
+    msg.to_s + ' ' + [ '', 'epic', 'uber', 'mega', 'super', 'hyper', 'constant', 'exponential', 'unlimited', 'breaking', 'ugly', 'dark force', 'wow', 'concrete', 'pirate' ].at_rand + ' fail'
   end
   
   def buddylist_command(stem, sender, reply_to, msg)
