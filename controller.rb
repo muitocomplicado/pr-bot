@@ -5,6 +5,7 @@ require 'rubygems'
 # gem 'hpricot', '~> 0.6.164'
 gem 'simple-rss', '~> 1.1'
 gem 'facets', '~> 2.5.0'
+gem 'json', '~> 1.1.7'
 
 # require 'hpricot'
 require 'simple-rss'
@@ -12,10 +13,13 @@ require 'open-uri'
 require 'facets/random'
 require 'uri'
 require 'time'
+require 'cgi'
+require 'net/http'
+require 'json'
 
 class Controller < Autumn::Leaf
   before_filter :check_message, 
-                :except => [ :about, :help, :fail, :latest, :hardcoded, :nuke, :jdam, :arty, 
+                :except => [ :about, :help, :fail, :latest, :hardcoded, :nuke, :jdam, :arty, :translate, :tr,
                              :mortars, :ied, :grenade, :rifle, :sniper, :cake, :buddies, :buddylist, :commands ]
   before_filter :downcase_message, 
                 :only => [ :leet, :hardcoded, :likesmen, :server, :servers, :player, :players, :buddies, :decide ]
@@ -255,6 +259,48 @@ class Controller < Autumn::Leaf
   
   def cake_command(stem, sender, reply_to, msg)
     "the cake is a lie"
+  end
+  
+  def tr_command(stem, sender, reply_to, msg)
+    translate_command(stem, sender, reply_to, msg)
+  end
+  
+  def translate_command(stem, sender, reply_to, msg)
+    
+    base_translate = 'http://ajax.googleapis.com/ajax/services/language/translate'
+    base_detect    = 'http://ajax.googleapis.com/ajax/services/language/detect' 
+
+    params = {
+      :q => msg,
+      :v => 1.0  
+    }
+
+    query = params.map{ |k,v| "#{k}=#{CGI.escape(v.to_s)}" }.join('&')
+    response = Net::HTTP.get_response( URI.parse( "#{base_detect}?#{query}" ) )
+    json = JSON.parse( response.body )
+
+    if json['responseStatus'] == 200
+      from = json['responseData']['language']
+    else
+      return json['responseDetails']
+    end
+
+    params = {
+      :langpair => "#{from}|en", 
+      :q => msg,
+      :v => 1.0  
+    }
+
+    query = params.map{ |k,v| "#{k}=#{CGI.escape(v.to_s)}" }.join('&')
+    response = Net::HTTP.get_response( URI.parse( "#{base_translate}?#{query}" ) )
+    json = JSON.parse( response.body )
+
+    if json['responseStatus'] == 200
+      return json['responseData']['translatedText']
+    else
+      return json['responseDetails']
+    end
+    
   end
   
   private
