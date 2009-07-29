@@ -34,6 +34,7 @@ Commands available:
 - !likesmen <nick> tells you if somebody likes men.
 
 - !google <something> gives you a link using letmegooglethatforyou.com
+- !translate <something> gives you a translation of the string to english. Alias: !tr.
 
 - !magic_eight_ball <question> gives you an answer to that question. Aliases: !magic8ball, !m8b and !prbot.
 
