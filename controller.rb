@@ -296,7 +296,7 @@ class Controller < Autumn::Leaf
     json = JSON.parse( response.body )
 
     if json['responseStatus'] == 200
-      return json['responseData']['translatedText']
+      return json['responseData']['translatedText'] + " (#{from})" 
     else
       return json['responseDetails']
     end
