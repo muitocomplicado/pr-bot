@@ -19,7 +19,7 @@ require 'json'
 
 class Controller < Autumn::Leaf
   before_filter :check_message, 
-                :except => [ :about, :help, :fail, :latest, :hardcoded, :nuke, :jdam, :arty, :translate, :tr,
+                :except => [ :about, :help, :fail, :latest, :news, :hardcoded, :nuke, :jdam, :arty, :translate, :tr,
                              :mortars, :ied, :grenade, :rifle, :sniper, :cake, :buddies, :buddylist, :commands ]
   before_filter :downcase_message, 
                 :only => [ :leet, :hardcoded, :likesmen, :server, :servers, :player, :players, :buddies, :decide ]
@@ -129,6 +129,12 @@ class Controller < Autumn::Leaf
   def latest_command(stem, sender, reply_to, msg)
     rss = SimpleRSS.parse(open('http://www.realitymod.com/forum/external.php?type=RSS2'))
     var :rss => rss.items[0..4]
+  end
+  
+  def news_command(stem, sender, reply_to, msg)
+    rss = SimpleRSS.parse(open('http://pipes.yahoo.com/pipes/pipe.run?_id=29f033b939fc015f943a18e140a85623&_render=rss'))
+    var :rss => rss.items[0..4]
+    render :latest
   end
   
   def server_command(stem, sender, reply_to, msg)

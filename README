@@ -6,6 +6,7 @@ irc.quakenet.org
 Commands available:
 
 - !latest returns the latest posts in the forums.
+- !news returns the latest highlights, dev blogs and events news.
 
 - !server <shortname> gets the current server status.
 - !server <shortname> <ip>:<port> registers the server with that shortname.
