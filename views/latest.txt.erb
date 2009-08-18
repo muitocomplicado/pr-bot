@@ -1,3 +1,3 @@
 <% var(:rss).each do |item| %>
-  <%= item.title %> - <%= item.link %>
+  <%= item.title %> - <%= open('http://bit.ly/api?url=' + item.link, "UserAgent" => "Ruby-ShortLinkCreator").read %>
 <% end %>
